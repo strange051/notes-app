@@ -1,55 +1,61 @@
-// AddNote.js
-
-import { useState } from 'react';
+// src/AddNote.js
+import React, { useState } from 'react';
 import { db } from './firebase'; // Import Firestore
 import { collection, addDoc } from 'firebase/firestore'; // Import Firestore functions
-import './App.css'; // Import CSS
+import { useAuth } from './AuthProvider'; // Import Auth context
 
 function AddNote() {
-  const [note, setNote] = useState({ title: '', content: '' });
+  const { currentUser } = useAuth(); // Get current user from AuthProvider
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [error, setError] = useState(null); // State for error message
 
-  // Handle input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNote((prevNote) => ({ ...prevNote, [name]: value }));
-  };
-
-  // Handle adding a note
   const handleAddNote = async (e) => {
-    e.preventDefault(); // Prevent page refresh
-    const { title, content } = note; // Destructure note
+    e.preventDefault(); // Prevent default form submission
+    if (!currentUser) {
+      setError('You must be logged in to create a note.');
+      return;
+    }
 
-    if (!title || !content) return; // Ensure title and content are provided
+    try {
+      // Add a new note document to Firestore
+      await addDoc(collection(db, 'notes'), {
+        title,
+        content,
+        uid: currentUser.uid, // Store the user's UID with the note
+        createdAt: new Date(), // Optional: timestamp
+      });
 
-    // Add a new note to Firestore
-    await addDoc(collection(db, 'notes'), {
-      ...note,
-      createdAt: new Date(), // Optional: Timestamp
-    });
-
-    // Clear input fields
-    setNote({ title: '', content: '' });
+      // Clear the input fields after successful submission
+      setTitle('');
+      setContent('');
+      setError(null); // Clear any previous errors
+    } catch (error) {
+      console.error('Error adding note:', error);
+      setError('Failed to add note. Please try again.');
+    }
   };
 
   return (
-    <form onSubmit={handleAddNote}>
-      <input
-        type="text"
-        name="title" // Specify name attribute
-        placeholder="Title"
-        value={note.title}
-        onChange={handleChange}
-        required
-      />
-      <textarea
-        name="content" // Specify name attribute
-        placeholder="Content"
-        value={note.content}
-        onChange={handleChange}
-        required
-      ></textarea>
-      <button type="submit">Add Note</button>
-    </form>
+    <div>
+      <form onSubmit={handleAddNote}>
+        <input
+          type="text"
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+        <textarea
+          placeholder="Content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          required
+        />
+        <button type="submit">Add Note</button>
+        {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
+      </form>
+    </div>
   );
 }
 

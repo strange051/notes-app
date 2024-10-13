@@ -1,12 +1,16 @@
+// src/NoteList.js
+
 import { useEffect, useState } from 'react';
 import { db } from './firebase'; // Import Firestore
 import { collection, query, where, onSnapshot, doc, deleteDoc } from 'firebase/firestore'; // Import Firestore functions
 import './App.css'; // Import CSS
 import { useAuth } from './AuthProvider'; // Import Auth context
+import NoteModal from './NoteModal'; // Import the new Modal component
 
 function NoteList() {
   const [notes, setNotes] = useState([]);
   const [selectedNotes, setSelectedNotes] = useState([]); // State for selected notes
+  const [editingNote, setEditingNote] = useState(null); // State for the note being edited
   const { currentUser } = useAuth(); // Get current user from AuthProvider
 
   useEffect(() => {
@@ -49,6 +53,15 @@ function NoteList() {
     }
   };
 
+  // Open the modal for editing a note
+  const openEditModal = (note) => {
+    setEditingNote(note); // Set the note to be edited
+  };
+
+  const closeModal = () => {
+    setEditingNote(null); // Close the modal
+  };
+
   return (
     <div>
       {selectedNotes.length > 0 && (
@@ -63,11 +76,13 @@ function NoteList() {
             <div
               className={`note ${selectedNotes.includes(note.id) ? "selected" : ""}`}
               key={note.id}
+              onClick={() => openEditModal(note)} // Open modal on note click (excluding checkbox)
             >
               <input
                 type="checkbox"
                 checked={selectedNotes.includes(note.id)}
-                onChange={() => handleSelectNote(note.id)}
+                onChange={() => handleSelectNote(note.id)} // Select note when checkbox is changed
+                onClick={(e) => e.stopPropagation()} // Prevent click from bubbling up to the note div
               />
               <h2>{note.title}</h2>
               <p>{note.content}</p>
@@ -77,6 +92,10 @@ function NoteList() {
           <p>No notes available.</p>
         )}
       </div>
+
+      {editingNote && (
+        <NoteModal note={editingNote} onClose={closeModal} /> // Show modal if editing a note
+      )}
     </div>
   );
 }

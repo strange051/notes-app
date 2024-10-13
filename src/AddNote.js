@@ -1,38 +1,49 @@
 // src/AddNote.js
 import React, { useState } from 'react';
-import { db } from './firebase'; // Import Firestore
-import { collection, addDoc } from 'firebase/firestore'; // Import Firestore functions
-import { useAuth } from './AuthProvider'; // Import Auth context
+import { db } from './firebase'; // Firestore instance
+import { collection, addDoc } from 'firebase/firestore'; // Firestore functions
+import { useAuth } from './AuthProvider'; // Access to currentUser
 
 function AddNote() {
-  const { currentUser } = useAuth(); // Get current user from AuthProvider
+  const { currentUser } = useAuth(); // Get the logged-in user from AuthProvider
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [error, setError] = useState(null); // State for error message
+  const [error, setError] = useState(null); // State for error messages
+  const [success, setSuccess] = useState(null); // State for success messages
 
   const handleAddNote = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault(); // Prevent form submission
     if (!currentUser) {
       setError('You must be logged in to create a note.');
       return;
     }
 
     try {
-      // Add a new note document to Firestore
+      // Log the data you're about to send to Firestore
+      console.log({
+        title,
+        content,
+        uid: currentUser.uid, // Ensure uid is correct
+        createdAt: new Date(),
+      });
+
+      // Firestore call to add a new note
       await addDoc(collection(db, 'notes'), {
         title,
         content,
-        uid: currentUser.uid, // Store the user's UID with the note
+        uid: currentUser.uid, // Attach the user's UID to the note
         createdAt: new Date(), // Optional: timestamp
       });
 
-      // Clear the input fields after successful submission
+      // Clear the input fields after a successful submission
       setTitle('');
       setContent('');
-      setError(null); // Clear any previous errors
+      setError(null); // Clear previous errors
+      setSuccess('Note added successfully!'); // Show success message
     } catch (error) {
       console.error('Error adding note:', error);
-      setError('Failed to add note. Please try again.');
+      setError('Failed to add note. Please try again.'); // Handle error
+      setSuccess(null); // Clear previous success messages
     }
   };
 
@@ -53,7 +64,8 @@ function AddNote() {
           required
         />
         <button type="submit">Add Note</button>
-        {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
+        {error && <p style={{ color: 'red' }}>{error}</p>} {/* Show error messages */}
+        {success && <p style={{ color: 'green' }}>{success}</p>} {/* Show success messages */}
       </form>
     </div>
   );

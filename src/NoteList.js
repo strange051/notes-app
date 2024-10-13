@@ -1,12 +1,12 @@
-// src/NoteList.js
 import { useEffect, useState } from 'react';
 import { db } from './firebase'; // Import Firestore
-import { collection, query, where, onSnapshot } from 'firebase/firestore'; // Import Firestore functions
+import { collection, query, where, onSnapshot, doc, deleteDoc } from 'firebase/firestore'; // Import Firestore functions
 import './App.css'; // Import CSS
 import { useAuth } from './AuthProvider'; // Import Auth context
 
 function NoteList() {
   const [notes, setNotes] = useState([]);
+  const [selectedNotes, setSelectedNotes] = useState([]); // State for selected notes
   const { currentUser } = useAuth(); // Get current user from AuthProvider
 
   useEffect(() => {
@@ -29,12 +29,46 @@ function NoteList() {
     return () => unsubscribe(); // Clean up the listener on unmount
   }, [currentUser]);
 
+  // Handle selecting/unselecting notes
+  const handleSelectNote = (noteId) => {
+    setSelectedNotes((prevSelected) =>
+      prevSelected.includes(noteId)
+        ? prevSelected.filter((id) => id !== noteId) // Unselect note
+        : [...prevSelected, noteId] // Select note
+    );
+  };
+
+  // Delete selected notes from Firestore
+  const handleDeleteSelectedNotes = async () => {
+    try {
+      const promises = selectedNotes.map((noteId) => deleteDoc(doc(db, "notes", noteId)));
+      await Promise.all(promises); // Delete all selected notes
+      setSelectedNotes([]); // Clear selected notes after deletion
+    } catch (error) {
+      console.error("Error deleting notes:", error);
+    }
+  };
+
   return (
     <div>
-      <div className="note-list">
+      {selectedNotes.length > 0 && (
+        <button onClick={handleDeleteSelectedNotes} className="delete-button">
+          Delete Selected ({selectedNotes.length})
+        </button>
+      )}
+
+      <div className="note-grid">
         {notes.length > 0 ? (
           notes.map((note) => (
-            <div className="note" key={note.id}>
+            <div
+              className={`note ${selectedNotes.includes(note.id) ? "selected" : ""}`}
+              key={note.id}
+            >
+              <input
+                type="checkbox"
+                checked={selectedNotes.includes(note.id)}
+                onChange={() => handleSelectNote(note.id)}
+              />
               <h2>{note.title}</h2>
               <p>{note.content}</p>
             </div>

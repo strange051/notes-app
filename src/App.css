@@ -1,230 +1,119 @@
+/* App.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
 /* Global Styles */
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f5f5f5;
+  background-color: #f0f2f5;
+  color: #333;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  height: 100vh; /* Full height of the viewport */
+  height: 100vh;
 }
 
 .App {
   max-width: 800px;
   width: 100%;
   padding: 20px;
-  overflow: hidden; /* Hide overflow to fit grid nicely */
+  background-color: #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
 }
 
 /* Header Styles */
 h1 {
-  color: #333;
-  margin-bottom: 20px;
+  text-align: center;
+  color: #4CAF50;
+  margin-bottom: 30px;
+  font-weight: 600;
 }
 
 /* Form Styles */
 form {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  gap: 12px;
 }
 
 input,
 textarea {
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  border-radius: 8px;
   font-size: 16px;
+  transition: all 0.3s ease;
 }
 
 input:focus,
 textarea:focus {
   outline: none;
-  border-color: #4CAF50; /* Green border on focus */
+  border-color: #4CAF50;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
 }
 
 /* Button Styles */
 button {
-  padding: 10px;
+  padding: 12px 15px;
   background-color: #4CAF50;
   color: white;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  border-radius: 8px;
   font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 button:hover {
-  background-color: #45a049; /* Darker green on hover */
+  background-color: #45a049;
+}
+
+/* Logout Button */
+.logout-button {
+  background-color: #f44336;
+  margin-top: 10px;
+}
+
+.logout-button:hover {
+  background-color: #e53935;
 }
 
 /* Note List Styles */
-.note-list {
+.note-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
-  gap: 15px; /* Space between grid items */
-  height: calc(100vh - 120px); /* Adjust height for header and form */
-  overflow-y: auto; /* Enable vertical scrolling if necessary */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 30px;
 }
 
 .note {
   background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 15px;
-  transition: transform 0.2s;
-  cursor: pointer; /* Change cursor to pointer */
-  display: flex; /* Use flexbox for layout */
-  flex-direction: column; /* Stack items vertically */
-  max-height: 100px; /* Limit height for the note */
-  overflow: hidden; /* Hide overflow content */
-}
-
-.note:hover {
-  transform: scale(1.02); /* Slight scale on hover */
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  position: relative;
 }
 
 .note h2 {
   margin: 0;
   font-size: 18px;
-  overflow-wrap: break-word; /* Ensure long words break to the next line */
+  color: #333;
 }
 
 .note p {
-  margin: 5px 0 0 0;
+  margin-top: 8px;
   font-size: 14px;
-  overflow-wrap: break-word; /* Ensure long words break to the next line */
-  display: -webkit-box; /* Use webkit box model */
-  -webkit-box-orient: vertical; /* Define orientation */
-  -webkit-line-clamp: 3; /* Limit the number of lines to show (adjust as needed) */
-  overflow: hidden; /* Hide overflow content */
+  color: #666;
 }
 
-/* Popup Styles */
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000; /* Ensure popup is on top */
-  visibility: hidden; /* Hide by default */
-  opacity: 0; /* Hidden opacity */
-  transition: visibility 0s, opacity 0.5s ease;
-}
-
-.popup-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 400px;
-  max-width: 90%;
-  overflow-wrap: break-word; /* Allow words to break if they are too long */
-}
-
-.popup-content h2 {
-  margin-top: 0; /* Remove default margin */
-  overflow-wrap: break-word; /* Ensure long words break to the next line */
-}
-
-.popup-content p {
-  margin: 10px 0 0; /* Margin for the paragraph */
-  font-size: 14px; /* Font size for the paragraph */
-  overflow-wrap: break-word; /* Ensure long words break to the next line */
-}
-
-/* Show the popup */
-.popup.show {
-  visibility: visible; /* Show visibility */
-  opacity: 1; /* Show opacity */
-}
-
-/* Search Bar Styles */
-.search-bar {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.search-icon {
-  margin-right: 8px;
-  font-size: 1.2em; /* Adjust size as needed */
-}
-
-.search-bar input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1em;
-}
-
-/* Additional Popup Content Styles */
-.popup-content input,
-.popup-content textarea {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.popup-content button {
-  padding: 10px;
-  background-color: #4CAF50; /* Green */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.popup-content button:hover {
-  background-color: #45a049; /* Darker green on hover */
-}
-
-.popup-content button.cancel {
-  background-color: #f44336; /* Red */
-}
-
-.popup-content button.cancel:hover {
-  background-color: #e53935; /* Darker red on hover */
-}
-
-/* App.css */
-
-.logout-button {
-  margin-top: 10px; /* Add some space above the button */
-  padding: 10px; /* Padding for the button */
-  background-color: #f44336; /* Red background */
-  color: white; /* White text */
-  border: none; /* No border */
-  border-radius: 4px; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-}
-
-.logout-button:hover {
-  background-color: #e53935; /* Darker red on hover */
-}
-
-.note-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.note {
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  position: relative;
-  cursor: pointer;
+/* Note Hover Effect */
+.note:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .note input[type="checkbox"] {
@@ -234,60 +123,194 @@ button:hover {
 }
 
 .note.selected {
-  background-color: #e0f7fa; /* Light cyan for selected notes */
-  border: 2px solid #00796b; /* Darker border for selected notes */
+  background-color: #e0f7fa;
+  border: 2px solid #00796b;
 }
 
-
+/* Delete Button */
 .delete-button {
-  margin-bottom: 20px;
-  padding: 10px 15px;
   background-color: red;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  margin: 10px 0;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
 .delete-button:hover {
   background-color: darkred;
 }
 
+/* Modal Overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* Ensure the modal is on top */
+  z-index: 999;
 }
 
+/* Modal Content */
 .modal {
   background-color: white;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 400px; /* Adjust width as needed */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  width: 400px;
+  max-width: 90%;
+  animation: slideDown 0.4s ease-out;
 }
 
-.modal input[type="text"],
-.modal textarea {
-  width: 100%;
-  margin: 10px 0;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+/* Slide Down Animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.modal button {
-  margin-top: 10px;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
+
+/* Note Styles */
+.note {
+  background-color: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
+  position: relative;
+  overflow: hidden; /* Prevent overflow */
+  word-wrap: break-word; /* Ensure long words wrap */
+  display: flex;
+  flex-direction: column; /* Stack title and content vertically */
+  gap: 8px;
 }
 
+/* Ensure text wraps */
+.note h2, 
+.note p {
+  margin: 0;
+  overflow-wrap: break-word; /* Handle text breaking */
+  word-break: break-word;
+  white-space: pre-wrap; /* Preserve newlines but allow wrapping */
+}
+
+/* Optional: Adjust content styling for readability */
+.note h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.note p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5; /* Improve readability */
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px; /* Ensure proper spacing on smaller screens */
+}
+
+/* Modal Content */
+.modal {
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  width: 400px;
+  max-width: 100%; /* Make sure it fits smaller screens */
+  animation: slideDown 0.4s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Form inside Modal */
+.modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Input and Textarea Styling */
+.modal input,
+.modal textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  resize: vertical; /* Allow vertical resizing */
+  transition: all 0.3s ease;
+  overflow-wrap: break-word; /* Ensure text wraps */
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.modal input:focus,
+.modal textarea:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Buttons in Modal */
+.modal button {
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  flex: 1; /* Make buttons consistent in size */
+}
+
+.modal button[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.modal button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+.modal button.cancel {
+  background-color: #f44336;
+  color: white;
+}
+
+.modal button.cancel:hover {
+  background-color: #e53935;
+}
+
+/* Slide Down Animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

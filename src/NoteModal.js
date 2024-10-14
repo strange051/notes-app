@@ -1,28 +1,29 @@
 // src/NoteModal.js
 
 import React, { useState } from 'react';
-import { db } from './firebase'; // Import Firestore
-import { doc, updateDoc } from 'firebase/firestore'; // Import Firestore functions
-import './App.css'; // Import CSS
+import { db } from './firebase';
+import { doc, updateDoc } from 'firebase/firestore';
+import './App.css';
 
 function NoteModal({ note, onClose }) {
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
-  const [error, setError] = useState(null); // State for error message
+  const [error, setError] = useState(null);
+  const [isUpdating, setIsUpdating] = useState(false); // Track submission state
 
   const handleUpdateNote = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
+    setIsUpdating(true); // Disable button during submission
+
     try {
-      // Update the note in Firestore
-      const noteRef = doc(db, "notes", note.id);
-      await updateDoc(noteRef, {
-        title,
-        content,
-      });
-      onClose(); // Close the modal after successful update
+      const noteRef = doc(db, 'notes', note.id);
+      await updateDoc(noteRef, { title, content });
+      onClose();
     } catch (error) {
       console.error('Error updating note:', error);
       setError('Failed to update note. Please try again.');
+    } finally {
+      setIsUpdating(false); // Re-enable button
     }
   };
 
@@ -30,7 +31,8 @@ function NoteModal({ note, onClose }) {
     <div className="modal-overlay">
       <div className="modal">
         <h2>Edit Note</h2>
-        {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+
         <form onSubmit={handleUpdateNote}>
           <input
             type="text"
@@ -45,8 +47,14 @@ function NoteModal({ note, onClose }) {
             onChange={(e) => setContent(e.target.value)}
             required
           />
-          <button type="submit">Update Note</button>
-          <button type="button" onClick={onClose}>Cancel</button>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+            <button type="submit" disabled={isUpdating}>
+              {isUpdating ? 'Updating...' : 'Update Note'}
+            </button>
+            <button type="button" className="cancel" onClick={onClose}>
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
     </div>

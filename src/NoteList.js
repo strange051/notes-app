@@ -1,100 +1,95 @@
 // src/NoteList.js
 
-import { useEffect, useState } from 'react';
-import { db } from './firebase'; // Import Firestore
-import { collection, query, where, onSnapshot, doc, deleteDoc } from 'firebase/firestore'; // Import Firestore functions
-import './App.css'; // Import CSS
-import { useAuth } from './AuthProvider'; // Import Auth context
-import NoteModal from './NoteModal'; // Import the new Modal component
+import React, { useEffect, useState } from 'react';
+import { db } from './firebase';
+import { collection, query, where, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
+import { useAuth } from './AuthProvider';
+import './App.css';
+import NoteModal from './NoteModal';
 
 function NoteList() {
   const [notes, setNotes] = useState([]);
-  const [selectedNotes, setSelectedNotes] = useState([]); // State for selected notes
-  const [editingNote, setEditingNote] = useState(null); // State for the note being edited
-  const { currentUser } = useAuth(); // Get current user from AuthProvider
+  const [selectedNotes, setSelectedNotes] = useState([]);
+  const [editingNote, setEditingNote] = useState(null);
+  const { currentUser } = useAuth();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!currentUser) return; // If no user is logged in, don't fetch notes
+    if (!currentUser) return;
 
-    // Reference to the "notes" collection, filtered by the user's UID
     const notesCollection = query(
-      collection(db, "notes"),
-      where("uid", "==", currentUser.uid) // Only fetch notes for the logged-in user
+      collection(db, 'notes'),
+      where('uid', '==', currentUser.uid)
     );
 
-    // Set up a real-time listener for the user's notes
     const unsubscribe = onSnapshot(notesCollection, (snapshot) => {
-      const notesList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setNotes(notesList); // Update state with the user's notes
-    }, (error) => {
-      console.error("Error fetching notes:", error); // Log any error
+      const notesList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setNotes(notesList);
+      setLoading(false); // Stop loading when notes are fetched
     });
 
-    return () => unsubscribe(); // Clean up the listener on unmount
+    return () => unsubscribe();
   }, [currentUser]);
 
-  // Handle selecting/unselecting notes
   const handleSelectNote = (noteId) => {
-    setSelectedNotes((prevSelected) =>
-      prevSelected.includes(noteId)
-        ? prevSelected.filter((id) => id !== noteId) // Unselect note
-        : [...prevSelected, noteId] // Select note
+    setSelectedNotes((prev) =>
+      prev.includes(noteId)
+        ? prev.filter((id) => id !== noteId)
+        : [...prev, noteId]
     );
   };
 
-  // Delete selected notes from Firestore
   const handleDeleteSelectedNotes = async () => {
+    if (!window.confirm('Are you sure you want to delete selected notes?')) return;
+
     try {
-      const promises = selectedNotes.map((noteId) => deleteDoc(doc(db, "notes", noteId)));
-      await Promise.all(promises); // Delete all selected notes
-      setSelectedNotes([]); // Clear selected notes after deletion
+      await Promise.all(
+        selectedNotes.map((noteId) => deleteDoc(doc(db, 'notes', noteId)))
+      );
+      setSelectedNotes([]);
     } catch (error) {
-      console.error("Error deleting notes:", error);
+      console.error('Error deleting notes:', error);
     }
-  };
-
-  // Open the modal for editing a note
-  const openEditModal = (note) => {
-    setEditingNote(note); // Set the note to be edited
-  };
-
-  const closeModal = () => {
-    setEditingNote(null); // Close the modal
   };
 
   return (
     <div>
       {selectedNotes.length > 0 && (
         <button onClick={handleDeleteSelectedNotes} className="delete-button">
-          Delete Selected ({selectedNotes.length})
+          Delete Selected Notes
         </button>
       )}
-
-      <div className="note-grid">
-        {notes.length > 0 ? (
-          notes.map((note) => (
+      {loading ? (
+        <p>Loading notes...</p>
+      ) : (
+        <div className="note-grid">
+          {notes.map((note) => (
             <div
-              className={`note ${selectedNotes.includes(note.id) ? "selected" : ""}`}
               key={note.id}
-              onClick={() => openEditModal(note)} // Open modal on note click (excluding checkbox)
+              className={`note ${selectedNotes.includes(note.id) ? 'selected' : ''}`}
+              onClick={() => setEditingNote(note)}
             >
               <input
                 type="checkbox"
                 checked={selectedNotes.includes(note.id)}
-                onChange={() => handleSelectNote(note.id)} // Select note when checkbox is changed
-                onClick={(e) => e.stopPropagation()} // Prevent click from bubbling up to the note div
+                onChange={() => handleSelectNote(note.id)}
+                onClick={(e) => e.stopPropagation()}
               />
               <h2>{note.title}</h2>
               <p>{note.content}</p>
             </div>
-          ))
-        ) : (
-          <p>No notes available.</p>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
       {editingNote && (
-        <NoteModal note={editingNote} onClose={closeModal} /> // Show modal if editing a note
+        <NoteModal
+          note={editingNote}
+          onClose={() => setEditingNote(null)}
+        />
       )}
     </div>
   );

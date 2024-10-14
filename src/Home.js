@@ -1,24 +1,45 @@
 // src/Home.js
 
-import React from 'react';
-import NoteList from './NoteList'; // Assuming this displays the user's notes
-import AddNote from './AddNote'; // Component to add notes
-import { useAuth } from './AuthProvider'; // Import Auth context
+import React, { useState } from 'react';
+import NoteList from './NoteList';
+import AddNote from './AddNote';
+import { useAuth } from './AuthProvider';
 
 function Home() {
-  const { currentUser, logout } = useAuth(); // Get current user and logout function from context
+  const { currentUser, logout } = useAuth();
+  const [searchQuery, setSearchQuery] = useState(''); // Add state for search query
 
   return (
     <div>
-      <h1>Welcome to Your Notes</h1>
-      {currentUser && (
-        <div className='containerbysahanoor'>
-          <p>You are logged in as: <strong>{currentUser.email}</strong></p>
-          <button className="logout-button" onClick={logout}>Log Out</button>
+      {/* Navbar */}
+      <nav className="navbar">
+        <div className="navbar-container">
+          <div className="search-bar">
+            <span className="search-icon">🔍</span>
+            <input
+              type="text"
+              placeholder="Search Notes"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="user-info">
+            {currentUser && (
+              <div className="username-container">
+                <p>Logged in as: <strong>{currentUser.email}</strong></p>
+                <button className="logout-button" onClick={logout}>
+                  Log Out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      )}
-      <AddNote /> {/* Component to add new notes */}
-      <NoteList /> {/* Component to list the user's notes */}
+      </nav>
+
+      {/* Main Content */}
+      <h1>Welcome to Your Notes</h1>
+      <AddNote />
+      <NoteList searchQuery={searchQuery} /> {/* Pass search query to NoteList */}
     </div>
   );
 }

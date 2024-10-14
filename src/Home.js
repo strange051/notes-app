@@ -12,7 +12,7 @@ function Home() {
     <div>
       <h1>Welcome to Your Notes</h1>
       {currentUser && (
-        <div>
+        <div className='containerbysahanoor'>
           <p>You are logged in as: <strong>{currentUser.email}</strong></p>
           <button className="logout-button" onClick={logout}>Log Out</button>
         </div>

@@ -1,2 +1,1 @@
-# Cloud Architecture Mini Project
-# Simple notes app built using react.js
+# Simple notes app built using react and node.js
